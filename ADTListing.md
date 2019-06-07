@@ -38,7 +38,7 @@ the maximum amount of items has been reached. Unbounded means that the list can 
 
 ## Exercises
 
- 1. Large integer ADT
- 
- NOTE: "Abstract Data Types are about exposing behavior to a user. Constrast that with a data structure which is a concrete representation of
- data from the point of view of the implementer." https://en.wikipedia.org/wiki/Abstract_data_type
+1. Large integer ADT
+
+NOTE: "Abstract Data Types are about exposing behavior to a user. Constrast that with a data structure which is a concrete representation of
+data from the point of view of the implementer." https://en.wikipedia.org/wiki/Abstract_data_type
