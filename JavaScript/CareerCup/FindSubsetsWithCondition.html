@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Algorithm Page
+        </title>
+		<style>
+			
+        </style>
+
+		<script src="../utils.js">
+        </script>
+        <script>
+			(function(){
+				// Can I sort the vector?
+				var k = 8;
+				function findSubsets(source, isValid){
+					var result = [];
+					source.sort();
+					findSubsetsHelper(source, result, 0, isValid || function(){return true;});
+					return result;
+				}
+				
+				function findSubsetsHelper(source, result, start, isValid, prevSubset){
+					for(var i = start; i < source.length; i++){
+						var newSubset = [];
+						if(prevSubset){
+							copyElements(prevSubset, newSubset);
+						}
+						newSubset.push(source[i]);
+						
+						if(isValid(newSubset)){
+							result.push(newSubset);
+						}
+						
+						findSubsetsHelper(source, result, i + 1, isValid, newSubset);
+					}
+				}
+				
+				function copyElements(source, destination){
+					for(var i = 0; i < source.length; i++){
+						destination.push(source[i]);
+					}
+				}
+				
+				function filter(subset){
+					// if sort available I can just get the first and last
+					// The sort is done in the findSubsets so it isn't repeatedly done
+					var max = subset[subset.length - 1];
+					var min = subset[0];
+					
+					/*var max = subset[0];
+					var min = subset[0];
+					
+					for(var i = 1; i < subset.length; i++){
+						if(subset[i] > max) max = subset[i];
+						if(subset[i] < min) min = subset[i];
+					}*/
+					
+					return max + min <= k;
+				}
+				
+				var source = [2,4,5,7];
+				
+				findSubsets(source, filter).forEach(htmlWriter.log);
+			})();
+        </script>
+    </head>
+
+    <body>
+        
+    </body>
+</html>

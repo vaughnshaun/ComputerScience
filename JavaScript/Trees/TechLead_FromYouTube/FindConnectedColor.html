@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Algorithm Page
+        </title>
+		<style>
+			#matrix-board{
+				position: relative;
+				float: left;
+				padding-right: 10px;
+			}
+			.matrix-col {
+				width: 50px;
+				height: 50px;
+				float:left;
+				border-style: solid;
+				border-color: lightgray;
+				border-width: 1px;
+				position: relative;
+			}
+			
+			/*Works but I don't need*/
+			/*#matrix-board:hover .matrix-col.highest-connected {
+				opacity: .3;
+			}*/
+			
+			.matrix-col.highest-connected.show {
+				opacity: .3;
+				transition: opacity .5s;
+			}
+			
+			.matrix-col:hover, .matrix-col.selected {
+				border-color:purple;
+				border-width: 2px;
+				transition: border-color .5s;
+			}
+			
+			.matrix-row:after {
+				content: "";
+				clear: both;
+				display: block;
+			}
+			
+			.cell-content {
+				width: 100%;
+				height: 100%;
+				text-align: center;
+				position: absolute;
+				font-weight: bold;
+				z-index: 2;
+				background: white;
+				line-height: 3.5;
+			}
+			
+			.cell-editor {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				text-align: center;
+			}
+        </style>
+
+        <script src="FindConnectedColor.js">
+        </script>
+    </head>
+
+    <body>
+        <div id="matrix-board">
+        </div>
+		<div id="colors">
+			<button id="0">Red</button>
+			<button id="1">Blue</button>
+			<button id="2">Yellow</button>
+			<button id="3">Black</button>
+			<button id="4">Green</button>
+		</div>
+		<button id="toogle-connected">Toogle Connected</button>
+		<div id="message">
+		</div>
+        <script>
+			// from:https://github.com/jserz/js_piece/blob/master/DOM/ChildNode/remove()/remove().md
+			(function (arr) {
+			  arr.forEach(function (item) {
+				if (item.hasOwnProperty('remove')) {
+				  return;
+				}
+				Object.defineProperty(item, 'remove', {
+				  configurable: true,
+				  enumerable: true,
+				  writable: true,
+				  value: function remove() {
+					if (this.parentNode !== null)
+					  this.parentNode.removeChild(this);
+				  }
+				});
+			  });
+			})([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+            (function(){
+                var grid = GridArray();
+				var selectedCell;
+				var gridRows = 5;
+				var gridCols = 5;
+				var toggleStates = [];
+				var colors = ['red', 'blue', 'yellow', 'black', 'green'];
+				var currentSelectedColor;
+				var matrixBoard = document.getElementById('matrix-board');
+				grid.loadCells([
+					['red', 'blue', 'red', 'blue', 'blue'],
+					['red', 'blue', 'black', 'blue', 'blue'],
+					['blue', 'yellow', 'blue', 'yellow', 'blue'],
+					['blue', 'green', 'green', 'green', 'blue'],
+					['blue', 'blue', 'blue', 'blue', 'blue']
+				], gridRows, gridCols);
+				
+				function renderGrid(){
+					var html = [];
+					// Delete rows
+					var existingRows = document.getElementsByClassName('matrix-row');
+					for(var i = grid.getRowCount(); i < existingRows.length; i++){
+						existingRows[i].remove();
+					}
+					
+					// Add rows
+					for(var i = existingRows.length; i < grid.getRowCount(); i++){
+						var newRow = document.createElement('div');
+						newRow.className = 'matrix-row';
+						matrixBoard.appendChild(newRow);
+					}
+					
+					// Delete rows
+					for(var i = grid.getRowCount(); i < existingRows.length; i++){
+						var newRow = document.createElement('div');
+						newRow.className = 'matrix-row';
+						matrixBoard.appendChild(newRow);
+					}
+					
+					// Update cells
+					existingRows = document.getElementsByClassName('matrix-row');
+					for(var i = 0; i < grid.getRowCount(); i++){
+						var parentRow = existingRows[i];
+						var childCells = parentRow.getElementsByClassName('matrix-col');
+						
+						// Delete extra cells
+						for(var j = grid.getColCount(); j < childCells.length; j++){
+							childCells[j].remove();
+						}
+						
+						// Update/Add cells
+						for(var j = 0; j < grid.getColCount(); j++){
+							var currentCell = childCells[j];
+							if(!currentCell){
+								var currentCell = document.createElement('div');
+								currentCell.id = 'cell-'+i+ '-' + j;
+								currentCell.className = 'matrix-col';
+								parentRow.appendChild(currentCell);
+							}
+							currentCell.style.background = grid.getCellData(i, j);
+						}
+					}
+					
+					var count = grid.getMaxSelectedCount();
+					document.getElementById('message').innerHTML = [
+						'<div>Color ' +count.color+ ' with a count of ' +count.count+ '</div>'
+					].join('');
+	
+					var allCols = document.getElementsByClassName('matrix-col');
+					for(var i = 0; i < allCols.length; i++){
+						allCols[i].className = allCols[i].className.replace(' highest-connected', "");
+					}
+					count.path.forEach(function(cell){
+						document.getElementById('cell-' +cell.getRow()+ '-' + cell.getCol()).className += ' highest-connected';
+					});
+				}
+				
+				function getAddAndDeleteCounts(els, gridCount){
+					var elsDeleteCount = els.length - gridCount;
+					var elsAddCount = elsDeleteCount *-1;
+					elsDeleteCount < 0 ? 0 : elsDeleteCount;
+					elsAddCount < 0 ? 0 : elsAddCount;
+					
+					return {
+						add: elsAddCount,
+						remove: elsDeleteCount
+					};
+				}
+				
+				function htmltoGrid(){
+					var inputs = [];
+					
+					var allRows = document.getElementsByClassName('matrix-row');
+					
+					for(var i = 0; i < allRows.length; i++){
+						inputs.push([]);
+						var allCols = allRows[i].getElementsByClassName('matrix-col');
+						for(var j =0; j < allCols.length; j++){
+							inputs[i].push(allCols[j].style.background);
+						}
+					}
+					
+					grid.loadCells(inputs, gridRows, gridCols);
+				}
+				
+				renderGrid();
+				
+				document.getElementById('colors').addEventListener('click', function(evt){
+					if(selectedCell && evt.target.nodeName == 'BUTTON'){
+						currentSelectedColor = parseInt(evt.target.id);
+						selectedCell.style.background = colors[currentSelectedColor];
+						htmltoGrid();
+						renderGrid();
+					}
+				});
+				document.getElementById('matrix-board').addEventListener('click', function(evt){
+					if(evt.target.className.indexOf('matrix-col') > -1){
+						// toggle through colors
+						if(selectedCell){
+							var idSplit = selectedCell.id.split('-');
+							var row = parseInt(idSplit[1]);
+							var col = parseInt(idSplit[2]);
+							currentSelectedColor = colors.indexOf(grid.getCellData(row, col));
+							
+							if(selectedCell == evt.target){
+								currentSelectedColor++;
+								if(currentSelectedColor >= colors.length){
+									currentSelectedColor = 0;
+								}
+								selectedCell.style.background = colors[currentSelectedColor];
+								htmltoGrid();
+								renderGrid();
+							}
+						}
+						selectedCell = evt.target;
+						
+						var allCells = document.getElementsByClassName('matrix-col');
+						for(var i = 0; i < allCells.length; i++){
+							allCells[i].className = allCells[i].className.replace(' selected', '');
+						}
+						selectedCell.className += ' selected';
+					}
+				});
+				document.getElementById('toogle-connected').addEventListener('click', function(evt){
+					var allCells = document.getElementsByClassName('matrix-col');
+					for(var i = 0; i < allCells.length; i++){
+						if(allCells[i].className.indexOf('show') > -1){
+							allCells[i].className = allCells[i].className.replace(' show', '');
+						}
+						else {
+							allCells[i].className += ' show';
+						}
+					}
+				});
+            })();
+        </script>
+    </body>
+</html>

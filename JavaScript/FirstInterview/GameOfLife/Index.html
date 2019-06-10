@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Game of Life
+        </title>
+
+        <style>
+			.alive {
+				background: black;
+			}
+			
+			.dead {
+				background: white;
+			}
+			
+			.cell {
+				float: left;
+				width: 60px;
+				height: 60px;
+				border-style: solid;
+				border-color: lightgray;
+			}
+			
+			.row::after {
+				display: block;
+				clear: both;
+				content: ""; 
+			}
+        </style>
+        <script src="GameOfLife.js">
+        </script>
+    </head>
+
+    <body>
+		<script>
+			(function(){
+				var gameOfLife = Games.Life();
+				
+				/*input = [
+					[true, true, true],
+					[true, false, true]
+				];*/
+				
+				/*input[0][1] = true;
+				input[1][1] = true;
+				input[1][2] = true;*/
+				/*input[0][1] = true;
+				input[1][1] = true;
+				input[1][2] = true;
+				input[0][1] = true;
+				input[2][1] = false;
+				input[9][4] = true;*/
+				
+				reset(gameOfLife);
+		
+				var speed = 200; // Generation speed in milliseconds
+				var timeId = setInterval(function(){
+					if(gameOfLife.isChanged()){
+						gameOfLife.doNextGeneration();
+						renderBoard(gameOfLife);
+					}
+					else {
+						//clearInterval(timeId);
+						reset(gameOfLife);
+					}
+				}, speed);
+				
+				function renderBoard(game){
+					var html = [];
+					for(var i = 0; i < gameOfLife.getRowCount(); i++){
+						html.push('<div class="row">')
+						for(var j = 0; j < gameOfLife.getColCount(); j++){
+							var aliveClass = game.isAlive(i, j) ? 'alive' : 'dead';
+							html.push('<div class="cell ' +aliveClass+ '"></div>');
+							
+						}
+						html.push('</div>');
+					}
+					document.body.innerHTML = html.join('');
+				}
+				
+				function reset(game){
+					var rSize = 12;
+					var cSize = 12;
+					var input = [];
+					for(var i = 0; i < rSize; i++){
+						input.push([]);
+						for(var j = 0; j < cSize; j++){
+							//var isAlive = ((i + j) % 3) == 0 ? true : false;
+							//var isAlive = (j * i / 2 % 3) == 0 ? true : false;
+							var isAlive = (Math.floor(Math.random() * 4) + 2 % 2) > 1 ? true : false;
+							input[i].push(isAlive);
+						}
+					}
+					
+					game.setInitialState(input, rSize, cSize);
+					renderBoard(game);
+				}
+			})();
+		</script>
+    </body>
+</html>

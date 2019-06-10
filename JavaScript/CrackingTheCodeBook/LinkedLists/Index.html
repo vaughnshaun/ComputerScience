@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Linked Lists
+        </title>
+
+        <style>
+        </style>
+        <script src="LinkedLists.js">
+        </script>
+    </head>
+
+    <body>
+		<p>
+			<div>
+				<label>Item: </label> <input id="item" type="text"/>
+			</div>
+			<div>
+				<label>Index: </label> <input id="index" type="text"/>
+			</div>
+		</p>
+		<button id="enqueue">Enqueue</button>
+		<button id="dequeue">Dequeue</button>
+		<button id="insert">Insert</button>
+		<button id="remove">Remove</button>
+		<button id="clear">Clear</button>
+		
+		<p id="nodes">
+		</p>
+		
+		<p>
+			<div>
+				<label>Node Count: </label><span id="node-count"></span>
+			</div>
+			<div>
+				<label>IsEmpty: </label><span id="is-empty"></span>
+			</div>
+		</p>
+		
+		<script src="LoadScripts.js"></script>
+		
+		<script>
+			loadFiles(function(){
+				var LinkedList = Lists.LinkedList;
+				var aList = LinkedList();
+				var bList = LinkedList();
+				
+				aList.enqueue(7);
+				aList.enqueue(1);
+				aList.enqueue(6);
+				
+				bList.enqueue(5);
+				bList.enqueue(9);
+				bList.enqueue(2);
+				
+				var sum = Questions.Ex2_5.recursive.addLists(aList.dangerous.getHeadNode(), bList.dangerous.getHeadNode());
+				
+				var answer = [];
+				while(sum){
+					answer.push(sum.item);
+					sum = sum.next;
+				}
+				
+				console.log(answer.join(''));
+			});
+		</script>
+		
+		<script>
+			(function(){
+				var LinkedList = Lists.LinkedList;
+				var myList = LinkedList();
+				
+				var itemInput = document.getElementById('item');
+				var indexInput = document.getElementById('index');
+				
+				document.getElementById('enqueue').addEventListener('click', function(){
+					var value = itemInput.value.trim();
+					if(itemInput.value){
+						myList.enqueue(value);
+						renderList();
+					}
+				});
+				
+				document.getElementById('dequeue').addEventListener('click', function(){
+					myList.dequeue();
+					renderList();
+				});
+				
+				document.getElementById('insert').addEventListener('click', function(){
+					var index = indexInput.value.trim();
+					var value = itemInput.value.trim();
+					if(value && index !== ''){
+						if(!isNaN(index)){
+							index = parseInt(index);
+							myList.insert(index, value);
+							renderList();
+						}
+					}
+				});
+				
+				document.getElementById('remove').addEventListener('click', function(){
+					var value = itemInput.value.trim();
+					if(value){
+						myList.remove(value);
+						renderList();
+					}
+				});
+				
+				document.getElementById('clear').addEventListener('click', function(){
+					myList.clear();
+					renderList();
+				});
+				
+				function renderList(){
+					document.getElementById('nodes').innerText = myList.getDisplayString();
+					document.getElementById('is-empty').innerText = myList.isEmpty() ? 'Yes' : 'No';
+					document.getElementById('node-count').innerText = myList.getCount();
+				}
+				
+				renderList();
+			})();
+		</script>
+    </body>
+</html>

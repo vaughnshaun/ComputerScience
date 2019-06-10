@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Trie
+        </title>
+		<style>
+			.
+        </style>
+
+		<script src="../utils.js">
+        </script>
+        <script>
+			function Trie() {
+				var root = Node();
+				function Node(){
+					return {
+						children: {},
+						isComplete: false
+					};
+				}
+				
+				function insert(arr){
+					var curNode = root;
+					for(var i = 0; i < arr.length; i++){
+						var curItem = arr[i];
+						// Get the child of current node
+						var child = curNode.children[curItem];
+						if(!child){
+							child = curNode.children[curItem] = Node();
+						}
+						
+						// update the current node
+						curNode = child;
+					}
+					
+					// After the loop set the is complete for the array 
+					curNode.isComplete = true;
+				}
+				
+				// Determine if the array is contained in the Trie
+				function findNode(arr, testCompleted){
+					var curNode;
+					if(arr.length > 0){
+						// Continue looking for the arr until the list is exhausted or it has been found
+						curNode = root;
+						for(var i = 0 ; i < arr.length && curNode; i++){
+							curNode = curNode.children[arr[i]];
+						}
+						
+						// clear the last found node if it is not completed
+						if(curNode && testCompleted && !curNode.isComplete){
+							curNode = undefined;
+						}
+					}
+					
+					return curNode;
+				}
+				
+				function findNodeByPrefix(arr){
+					return findNode(arr, false);
+				}
+				
+				function contains(arr){
+					return findNode(arr, true) ? true : false;
+				}
+				
+				function getCompletedByPrefix(arr){
+					var result = [];
+					var prefix = findNodeByPrefix(arr);
+					if(prefix){
+						getCompletedByPrefixHelper(arr, prefix, result);
+					}
+					return result;
+				}
+				
+				// Depth first algorithm
+				function getCompletedByPrefixHelper(arr, node, result){
+					// Only look for more sets if the node is not null
+					if(node){
+						// Loop through all of the children and add all completed sets
+						for(var key in node.children){
+							var newArr = [];
+							for(var i = 0; i < arr.length; i++){
+								newArr.push(arr[i]);
+							}
+							newArr.push(key);
+							
+							// Get the child
+							var curChild = node.children[key];
+							
+							// Only add the new set if it is complete
+							if(curChild.isComplete){
+								result.push(newArr);
+							}
+							
+							getCompletedByPrefixHelper(newArr, node.children[key], result);
+						}
+					}
+				}
+				
+				function removeRecursive(parent, node, arr, index){
+					// is found must be returned back up the stack in order for deletion to properly work
+					var isFound = false;
+					if(node && index < arr.length){
+						index = index || 0;
+						isFound = removeRecursive(parent, parent.children[arr[index]], arr, index);
+					}
+					else if(node){
+						isFound = true;
+					}
+					
+					if(isFound){
+						if(Object.keys(node.children).length == 0){
+							parent.children[arr[i]] = undefined;
+						}
+						else {
+							node.isComplete = false;
+						}
+					}
+					
+					return isFound;
+				}
+				
+				function removeIterative(node, arr){
+					var stack = Stack();
+					var curNode = node;
+					
+					for(var i = 0; i < arr.length && curNode; i++){
+						curNode = curNode.children[arr[i]];
+						if(curNode){
+							stack.push({node: curNode, key: arr[i]});
+						}
+					}
+					
+					// Do delete if the node is found and it is complete
+					if(curNode && curNode.isComplete){
+						while(!stack.isEmpty()){
+							var nodeToDelete = stack.pop();
+							if(Object.keys(nodeToDelete.node.children).length == 0){ // is leaf
+								var parent = stack.peek();
+								if(parent){
+									// In javascript it is better to blank out instead of using the delete
+									// But we will do this for laughs
+									delete parent.node.children[nodeToDelete.key];
+								}
+							}
+							else { // has children
+								nodeToDelete.node.isComplete = false;
+							}
+						}
+					}
+				}
+				
+				// Helper function
+				function removeNode(parent, node, nodeKey, isComplete){
+					if(object.keys(node.children).length == 0){
+						delete parent.children[nodeKey];
+					}
+					else {
+						node.isComplete = false;
+					}
+					
+				}
+				
+				return {
+					remove: function(arr){
+						removeIterative(root, arr);
+					},
+					
+					insert,
+					getCompletedByPrefix,
+					contains
+				};
+			}
+			
+			function Stack() {
+				var top;
+	
+				function push(item){
+					var newNode = {
+						item,
+					};
+					
+					newNode.next = top;
+					top = newNode;
+				}
+				
+				function pop() {
+					var item;
+					if(!isEmpty()){
+						item = top.item;
+						top = top.next;
+					}
+					
+					return item;
+				}
+				
+				function isEmpty(){
+					return !top;
+				}
+				
+				function peek(){
+					var item;
+					if(!isEmpty()){
+						item = top.item;
+					}
+					return item;
+				}
+				
+				return {
+					push,
+					pop,
+					isEmpty,
+					peek
+				};
+			}
+        </script>
+    </head>
+
+    <body>
+		<input type="text" id="add-text" />
+		<button id="add">Add</button>
+		<button id="delete">Delete</button>
+		<input type="text" id="input" />
+		<div id="possibleWords">
+		</div>
+		<script>
+			(function(){
+				var trie = Trie();
+				var values = [
+					'car',
+					'cars',
+					'tree',
+					'spot',
+					'trees',
+					'cart',
+					'cat',
+					'test',
+					'best',
+					'when',
+					'eastern',
+					'western',
+					'dog',
+					'do',
+					'dot',
+					'yes',
+					'no',
+					'on',
+					'done'
+				];
+				
+				values.forEach(trie.insert);
+				
+				document.getElementById('add').addEventListener('click', function(){
+					var addText = document.getElementById('add-text');
+					if(addText.value.trim()){
+						trie.insert(addText.value.trim());
+					}
+				});
+				
+				document.getElementById('delete').addEventListener('click', function(){
+					var addText = document.getElementById('add-text');
+					if(addText.value.trim()){
+						trie.remove(addText.value.trim());
+					}
+				});
+				
+				var possibleWordsEl = document.getElementById('possibleWords');
+				var inputEl = document.getElementById('input');
+				inputEl.addEventListener('keyup', function(){
+					var words = trie.getCompletedByPrefix(inputEl.value);
+					var html = [];
+					words.forEach(function(w){
+						html.push('<div>' +w.join('')+ '</div>');
+					});
+					
+					possibleWordsEl.innerHTML = html.join('');
+				});
+			})();
+		</script>
+    </body>
+</html>

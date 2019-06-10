@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Algorithm Page
+        </title>
+		<style>
+			
+        </style>
+
+		<script src="../utils.js">
+        </script>
+        <script>
+			(function(){
+				// Helper function that pairs the passed in array with the source array
+				function pairWith(start, pairArr, sourceArr, results){
+					for(var i = start; i < sourceArr.length; i++){
+						var newPair = [];
+						
+						// Copy the passed in pair
+						if(pairArr){
+							for(var j = 0; j < pairArr.length; j++){
+								newPair.push(pairArr[j]);
+							}
+						}
+						newPair.push(sourceArr[i]);
+						
+						// Pair the current pair with another number
+						pairWith(i + 1, newPair, sourceArr, results);
+						
+						results.push(newPair);
+					}
+				}
+				
+				function getSubsets(arr){
+					var subsets = [];
+					
+					pairWith(0, undefined, arr, subsets);
+					
+					return subsets;
+				}
+				
+				function printSets(subsets){
+					subsets.forEach(function(set){
+						htmlWriter.log('{' + set.join(', ') + '}');
+					});
+				}
+				
+				printSets(getSubsets([1,2,3]));
+			})();
+        </script>
+    </head>
+
+    <body>
+        
+    </body>
+</html>

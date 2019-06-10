@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Algorithm Page
+        </title>
+
+        <style>
+            .edge {
+                background: black;
+                width: 70px;
+                height: 1px;
+                display: inline-block;
+                position: relative;
+                top: -5px;
+            }
+
+            .cost {
+                position: absolute;
+                color: green;
+                font-size: 10px;
+                left: 50%;
+                top: -10;
+            }
+
+        </style>
+        <script src="DirectedGraph.js">
+        </script>
+    </head>
+
+    <body>
+        <div>
+            <h3>Find All Paths</h3>
+            <div>
+                <label>From: </label> <input id="from" type="text" />
+                <label>To: </label> <input id="to" type="text" />
+                <button id="find-all-btn">Find All</button>
+                <p>
+                    <span>Results: </span>
+                </p>
+                <div id="all-paths">
+                </div>
+            </div>
+        </div>
+        <script>
+            (function(){
+                var graph = Graph();
+                graph.readInputs([
+                    {from: 'D', to: 'C', cost: 10},
+                    {from: 'A', to: 'B', cost: 12},
+                    {from: 'D', to: 'B', cost: 23},
+                    {from: 'A', to: 'D', cost: 87},
+                    {from: 'E', to: 'D', cost: 43},
+                    {from: 'B', to: 'E', cost: 11},
+                    {from: 'C', to: 'A', cost: 19}
+                ]);
+
+                // Render all the paths to a point given the vertex on click
+                document.getElementById('find-all-btn').addEventListener('click', function(){
+                    var from = document.getElementById('from').value.trim();
+                    var to = document.getElementById('to').value.trim();
+                    var paths = graph.getAllPaths(from, to);
+
+                    var pathsHtml = paths.map((path, i) => {
+                        var html = [
+                            '<div>[' + i + ']: '
+                        ];
+                        
+                        // Get the path string
+                        for(var i = 0; i < path.length; i++){
+                            var pointInfo = path[i];
+                            var edge = ''
+                            if(path.length - 1 != i){
+                                edge = '<span class="edge"><span class="cost">'+pointInfo.edgeCost+'</span></span>';
+                            }
+                            html.push('(' + pointInfo.name + ')' + edge);
+                        }
+
+                        html.push('</div>');
+                        return html.join('');
+                    }).join('');
+
+                    document.getElementById('all-paths').innerHTML = pathsHtml;
+                });
+            })();
+        </script>
+    </body>
+</html>

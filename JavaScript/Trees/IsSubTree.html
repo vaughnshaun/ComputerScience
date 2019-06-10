@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Trie
+        </title>
+		<style>
+			.
+        </style>
+
+		<script src="../utils.js">
+        </script>
+        <script>
+			function NTree() {
+				var root;
+				
+				function add(item, node){
+					var newNode = {
+						item
+					};
+					
+					if(!root){
+						root = newNode;
+					}
+					else {
+						node = node || root;
+						if(!node.back){
+							node.firstChild = newNode;
+							node.back = newNode;
+						}
+						else {
+							node.back.nextSibling = newNode;
+							node.back = newNode;
+						}
+					}
+					
+					return newNode;
+				}
+				
+				function isSubTree(node){
+					var isEqual = false;
+					
+					// First find the root that matches the passed in node
+					var foundRoot = getNode(node);
+					
+					// If a root is found, check to see if the trees are the same
+					if(foundRoot){
+						isEqual = isSameTree(node, foundRoot);
+					}
+					
+					return isEqual;
+				}
+				
+				// Two trees are equal only if all their children are equal
+				function isSameTree(treeA, treeB){
+					var isEqual = true;
+					
+					if(treeA != treeB){
+						isEqual = false;
+					}
+					else {
+						// Compare the children of each tree in parallel
+						var iterA = treeA.firstChild;
+						var iterB = treeB.firstChild;
+						while(iterA && iterB && isEqual){
+							isEqual = isSameTree(iterA, iterB);
+							iterA = iterA.nextSibling;
+							iterB = iterB.nextSibling;
+						}
+					}
+					
+					return isEqual;
+				}
+				
+				function getNode(node){
+					return getNodeHelper(root, node);
+				}
+				
+				function getNodeHelper(curNode, searchNode){
+					var foundNode;
+					// Basically does a depth first search until the desired node is found
+					if(curNode){
+						if(searchNode == curNode){
+							foundNode = curNode;
+						}
+						else {
+							var iter = curNode.firstChild;
+							while(iter && !foundNode){
+								foundNode = getNodeHelper(iter, searchNode);
+								iter = iter.nextSibling;
+							}
+						}
+					}
+					
+					return foundNode;
+				}
+				
+				return {
+					add,
+					isSubTree
+				};
+			}
+			
+			var tree = NTree();
+			var root = tree.add(1);
+			var firstChild = tree.add(2);
+			tree.add(3);
+			var secondChild = tree.add(4);
+			tree.add(5);
+			
+			tree.add('a', firstChild);
+			tree.add('b', firstChild);
+			tree.add('c', firstChild);
+			tree.add('d', firstChild);
+			tree.add('e', firstChild);
+			
+			var another = tree.add('!', secondChild);
+			tree.add('@', secondChild);
+			tree.add('#', secondChild);
+			tree.add('$', secondChild);
+			tree.add('%', secondChild);
+			
+			tree.add('{', another);
+			tree.add('}', another);
+			tree.add('[', another);
+			tree.add(']', another);
+			
+			htmlWriter.log(tree.isSubTree(root));
+        </script>
+    </head>
+
+    <body>
+		
+    </body>
+</html>

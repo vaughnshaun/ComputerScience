@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Text Editor
+        </title>
+		<style>
+			
+        </style>
+
+		<script src="../utils.js">
+        </script>
+        <script>
+			function Stack(){
+				var top;
+				
+				function isEmpty(){
+					return !top ? true : false;
+				}
+				
+				function push(item){
+					var newNode = {
+						item
+					};
+					
+					newNode.next = top;
+					top = newNode;
+				}
+				
+				function pop() {
+					var item;
+					
+					if(!isEmpty()){
+						item = top.item;
+						top = top.next;
+					}
+					
+					return item;
+				}
+				
+				return {
+					push,
+					pop,
+					isEmpty
+				};
+			}
+			
+			function TextEditor(){
+				var end;
+				var curIter;
+				var history = Stack();
+				
+				function insert(character, noHistory){
+					var newNode = {
+						character
+					};
+					
+					// The first node entered
+					if(!end){ 
+						end = newNode;
+					}
+					else if(curIter == null){
+						end.right = newNode;
+						newNode.left = end;
+						end = newNode;
+					}
+					else {
+						newNode.right = curIter;
+						newNode.left = curIter.left;
+						if(curIter.left) curIter.left.right = newNode;
+						curIter.left = newNode;
+					}
+					
+					if(!noHistory) history.push(HistoryEntry('insert', {node: newNode}));
+				}
+				
+				function moveCursorRight(noHistory){
+					if(curIter){
+						curIter = curIter.right;
+						if(!noHistory) history.push(HistoryEntry('moveCursorRight', {}));
+					}
+				}
+				
+				function moveCursorLeft(noHistory){
+					if(curIter && curIter.left){
+						curIter = curIter.left;
+						if(!noHistory) history.push(HistoryEntry('moveCursorLeft', {}));
+					}
+					else if(end){
+						curIter = end;
+						history.push(HistoryEntry('moveCursorLeft', {}));
+					}
+				}
+				
+				function deleteNode(node){
+					if(node.left) node.left.right = node.right;
+					if(node.right) node.right.left = node.left;
+				}
+				
+				function backspace(){
+					if(curIter){
+						if(curIter.left){
+							history.push(HistoryEntry('backspace', {character: curIter.left.character}));
+							deleteNode(curIter.left);
+						}
+					}
+					else if(end){
+						history.push(HistoryEntry('backspace', {character: end.character}));
+						var temp = end.left;
+						deleteNode(end);
+						end = temp;
+					}
+				}
+				
+				function undo(){
+					// Pop of the history and revert the change
+					if(!history.isEmpty()){
+						var entry = history.pop();
+						var args = entry.args;
+						switch(entry.event){
+							case 'insert':
+								deleteNode(args.node);
+								break;
+							case 'moveCursorLeft':
+								moveCursorRight(true);
+								break;
+							case 'moveCursorRight':
+								moveCursorLeft(true);
+								break;
+							case 'backspace':
+								insert(args.character, true);
+								break;
+						}
+					}
+				}
+				
+				function HistoryEntry(event, args){
+					return {
+						event,
+						args
+					};
+				}
+				
+				function show(){
+					var iter;
+					if(end){
+						iter = end;
+						while(iter.left){
+							iter = iter.left;
+						}
+					}
+					
+					var all = [];
+					while(iter){
+						all.push(iter.character);
+						iter = iter.right;
+					}
+					
+					return all.join('');
+				}
+				
+				return {
+					insert,
+					moveCursorLeft,
+					moveCursorRight,
+					backspace,
+					undo,
+					show
+				}
+			}
+        </script>
+    </head>
+
+    <body>
+        <div id="my-editor"></div>
+    </body>
+	<script>
+		(function(){
+			var editorApi = TextEditor();
+			var character
+			/*var editorApi = TextEditor();
+			var editor = document.getElementById('my-editor');
+			document.addEventListener('keydown', function(event){
+				if(event.key >= 'a' && event.key <= 'z'){
+					var span = document.createElement('span');
+					span.innerHTML = event.key;
+					span.className = 'character';
+					editor.appendChild(span)
+					//editorApi.
+				}
+				else if(event.which == 37){ //left
+					
+				}
+				else if(event.which == 39){ //right
+				
+				}
+				else if(event.which == 38) //up
+			});*/
+		});
+	</script>
+</html>

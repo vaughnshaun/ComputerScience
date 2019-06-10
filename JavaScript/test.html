@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<svg height="210" width="500">
+  <line x1="0" y1="0" x2="200" y2="200" style="stroke:rgb(255,0,0);stroke-width:2" />
+  <line x1="210" y1="210" x2="200" y2="200" style="stroke:rgb(0,0,0);stroke-width:2" />
+  <line x1="230" y1="230" x2="200" y2="200" style="stroke:rgb(0,0,0);stroke-width:2" />
+  Sorry, your browser does not support inline SVG.
+</svg>
+
+</body>
+<script>
+    (function(){
+        var flaps = getArrowFlaps({x1: 0, y1: 0, x2: 200, y2: 200}, 20, .5);
+
+        function getArrowFlaps(line, flapLength, slopeFanning){
+    flapLength = flapLength || 4;
+
+    // Start of by finding the slop of the line
+    var rise = line.y2 - line.y1;
+    var run = line.x2 - line.x1;
+    var slope = rise / run;
+
+    var distance = getDistance(line);
+    var percentLine = flapLength / distance
+    
+    // What percent are the arrow's flaps' slope different from the base line slope
+    slopeFanning = slopeFanning || .5;
+    var deltaSlope = slope * slopeFanning;
+
+    var flap1 = {x2: line.x2, y2: line.y2};
+    var flap2 = {x2: line.x2, y2: line.y2};
+    var flapSlope1 = slope - deltaSlope;
+    var flapSlope2 = slope + deltaSlope;
+
+    flap1.x1 = flap1.x2 - (percentLine * flap1.x2);
+    flap2.x1 = flap2.x2 - (percentLine * flap2.x2);
+    flap1.y1 = flap1.y2 - (percentLine * flap1.y2);
+    flap2.y1 = flap2.y2 - (percentLine *  flap2.y2);
+
+    return {
+        flap1: flap1,
+        flap2: flap2
+    };
+}
+
+function getXFromDistanceSlope(x, slope, length){
+    return x - (length * Math.sqrt(1/(1 + Math.pow(slope, 2))));
+}
+
+function getYFromDistanceSlope(y, slope, length){
+    return y - (slope * length * Math.sqrt(1/(1 + Math.pow(slope, 2))));
+}
+
+function getDistance(line){
+    return Math.sqrt(Math.pow(line.x2 - line.x1, 2) + Math.pow(line.x2 - line.x1, 2));
+}
+    })();
+</script>
+</html>

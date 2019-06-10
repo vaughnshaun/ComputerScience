@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            1.7
+        </title>
+
+        <style>
+			#matrix-board{
+				position: relative;
+				float: left;
+				padding-right: 10px;
+			}
+			.matrix-col {
+				width: 50px;
+				height: 50px;
+				float:left;
+				border-style: solid;
+				border-color: lightgray;
+				border-width: 1px;
+				position: relative;
+			}
+			
+			.matrix-row:after {
+				content: "";
+				clear: both;
+				display: block;
+			}
+			
+			.cell-content {
+				width: 100%;
+				height: 100%;
+				text-align: center;
+				position: absolute;
+				font-weight: bold;
+				z-index: 2;
+				background: white;
+				line-height: 3.5;
+			}
+			
+			.cell-editor {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				text-align: center;
+			}
+        </style>
+    </head>
+
+    <body>
+		<div id="matrix-board">
+		</div>
+		<button id="zero-out">Zero Algorithm</button>
+		<button id="reset">Reset</button>
+		<script>
+			(function(){
+			
+				var numOfRows = 10;
+				var numOfCols = 12;
+				
+				var currentMatrix;
+				
+				// Initialize the matrix
+				resetMatrix();
+				
+				// Use Event delegation to detect matrix click. Remember click goes to the lowest and then bubbles up
+				var board = document.getElementById('matrix-board');
+				board.addEventListener('click', function(event){
+					var target = event.target;
+					if(target.className.trim() == 'cell-content'){
+						// Get the current value from the backing matrix
+						var colEl = target.parentElement;
+						var value = currentMatrix[colEl.matrixRow][colEl.matrixCol];
+						
+						// Set the value to the cell editor
+						var editor = colEl.querySelector('.cell-editor');
+						editor.value = value;
+						
+						target.style.display = 'none';
+						editor.focus();
+					}
+				});
+				
+				// Use foucsout for bubbling
+				board.addEventListener('focusout', function(event){
+					// Rerender the specified cell
+					var target = event.target;
+					if(target.className == 'cell-editor'){
+						var cell = target.parentElement;
+						var contentEl = cell.querySelector('.cell-content');
+						contentEl.style.display = "";
+						
+						// Wait for the editor to update and then assign the new value
+						setTimeout(function(){
+							currentMatrix[cell.matrixRow][cell.matrixCol] = target.value;
+							contentEl.innerText = currentMatrix[cell.matrixRow][cell.matrixCol];
+						});
+					}
+				});
+				
+				document.getElementById('reset').addEventListener('click', function(){
+					resetMatrix();
+					renderMatrix();
+				});
+				
+				document.getElementById('zero-out').addEventListener('click', function(){
+					renderMatrixZero();
+				});
+				
+				// Do the initial render
+				renderMatrix();
+				
+				function resetMatrix(){
+					currentMatrix = [];
+					for(var i = 0; i < numOfRows; i++){
+						var cols = [];
+						for(var j =0; j < numOfCols; j++){
+							cols.push(1);
+						}
+						currentMatrix.push(cols);
+					}
+				}
+				
+				function renderMatrix(){
+					/*var html = [];
+					
+					currentMatrix.forEach(function(row){
+						html.push('<div class="matrix-row">')
+						row.forEach(function(value){
+							html.push('<div class="matrix-col">' +value+ '</div>');
+						});
+						html.push('</div>');
+					});*/
+					
+					board.innerHTML = "";
+					currentMatrix.forEach(function(row, rowIndex){
+						var rowEl = document.createElement('div');
+						rowEl.className = 'matrix-row'
+						board.appendChild(rowEl);
+						row.forEach(function(value, colIndex){
+							var colEl = document.createElement('div');
+							colEl.className = 'matrix-col';
+							colEl.matrixRow = rowIndex;
+							colEl.matrixCol = colIndex;
+							colEl.innerHTML = [
+								'<div class="cell-content">'+value+'</div>',
+								'<input class="cell-editor" type="text" />'
+							].join('');
+							rowEl.appendChild(colEl);
+						});
+					});
+				}
+				
+				// Does the zero algorithm and rerenders the matrix
+				function renderMatrixZero(){
+					zeroMatrix(currentMatrix);
+					renderMatrix();
+				}
+			
+				function getMatrixZeroMap(matrix){
+					var row = {};
+					var col = {};
+					for(var i = 0; i < matrix.length; i++){
+						for(var j = 0; j < matrix[i].length; j++){
+							if(matrix[i][j] == 0){
+								row[i] = true;
+								col[j] = true;
+							}
+						}
+					}
+					
+					return {
+						row,
+						col
+					};
+				}
+				
+				function zeroMatrix(matrix){
+					var map = getMatrixZeroMap(matrix);
+					
+					for(var index in map.row){
+						zeroRow(matrix, index);
+					}
+					
+					for(var index in map.col){
+						zeroCol(matrix, index);
+					}
+				}
+				
+				function zeroRow(matrix, rowIndex) {
+					for(var i = 0; i < matrix[rowIndex].length; i++){
+						matrix[rowIndex][i] = 0;
+					}
+				}
+				
+				function zeroCol(matrix, colIndex){
+					for(var i = 0; i < matrix.length; i++){
+						matrix[i][colIndex] = 0;
+					}
+				}
+			})();
+		</script>
+    </body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Algorithm Page
+        </title>
+		<style>
+			
+        </style>
+
+		<script src="../../utils.js">
+        </script>
+        <script>
+			(function(){
+				var dictionary = ['vil', 'sit', 'flick', 'pat', 'pluck', 'sat', 'vat', 'val', 'vval', 'vitvvv', 'vatv', 'vitv'];
+				var inputWord = 'vit';
+				const MAX_ALLOWED = 1;
+				
+				function getCorrections(inputWord, dictionary){
+					var list = [];
+					
+					for(var i = 0; i < dictionary.length; i++){
+						if(isCorrection(inputWord, dictionary[i])){
+							list.push(dictionary[i]);
+						}
+					}
+					
+					return list;
+				}
+				
+				function isCorrection(inputWord, value){
+					// Map all the values in the value to compare
+					var map = {};
+					for(var i = 0; i < value.length; i++){
+						var curChar = value[i];
+						if(map[curChar] === undefined){
+							map[curChar] = 1;
+						}
+						else {
+							map[curChar]++;
+						}
+					}
+					
+					// Now look for errors
+					var errors = Math.abs(inputWord.length - value.length);
+					
+					for(var i = 0; i < inputWord.length && errors <= MAX_ALLOWED; i++){
+						var curChar = inputWord[i];
+						if(map[curChar]){
+							map[curChar]--;
+						}
+						else {
+						
+							errors++;
+						}
+					}
+					
+					return errors <= MAX_ALLOWED;
+				}
+				
+				htmlWriter.log(getCorrections(inputWord, dictionary).join(','));
+			})();
+        </script>
+    </head>
+
+    <body>
+        
+    </body>
+</html>

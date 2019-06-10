@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Algorithm Page
+        </title>
+		<style>
+			
+        </style>
+
+		<script src="utils.js">
+        </script>
+        <script>
+			(function(){
+				var arr = [1,2,3,4,5,6,7];
+				var n = 5;
+				function rotateLeft(arr, n){
+					// First move as many elements to the end as possible
+					var i = 0;
+					while(i < arr.length - n){
+						let tempI = arr[i];
+						arr[i] = arr[i + n];
+						arr[i + n] = tempI;
+						i++;
+					}
+					
+					// Move the remaining elements over to the left relative to the last successful shift
+					// i acts as a splitting point. All elements to the right of it are correctly shifted
+					// while elements to the left of it must be corrected
+					if(i <= Math.floor(arr.length / 2)){
+						/*for(;i > 0; i--){
+							let tempI = arr[i];
+							arr[i] = arr[i - 1];
+							arr[i - 1] = tempI;
+						}*/
+						for(; i < arr.length - 1; i++){
+							let tempI = arr[i];
+							arr[i] = arr[i + 1];
+							arr[i + 1] = tempI;
+						}
+					}
+					else {
+						/*for(; i < arr.length - 1; i++){
+							let tempI = arr[i];
+							arr[i] = arr[i + 1];
+							arr[i + 1] = tempI;
+						}*/
+						
+						for(var start = arr.length - 1; start > i; start--){
+							let tempS = arr[start];
+							arr[start] = arr[start - 1];
+							arr[start - 1] = tempS;
+						}
+					}
+				}
+				rotateLeft(arr, n);
+				htmlWriter.log(arr.join(','));
+			})();
+        </script>
+    </head>
+
+    <body>
+        
+    </body>
+</html>

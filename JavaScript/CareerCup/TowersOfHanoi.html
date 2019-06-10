@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Algorithm Page
+        </title>
+		<style>
+			
+        </style>
+
+		<script src="../utils.js">
+        </script>
+        <script>
+			(function(){
+				var towers = DirectionalArray();
+				
+				var numOfTowers = 3;
+				for(var i = 0; i < numOfTowers; i++){
+					// Alternate between which implementation of the stack you get
+					towers.push(Stack(i % 2 == 0 ? Stack.Array : Stack.Linked));
+				}
+				
+				// Set up the initial tower
+				var numOfDiscs = 3;
+				for(var i = numOfDiscs; i > 0; i--){
+					towers.get(0).push(i);
+				}
+				
+				function moveDiscsToTower(towers){					
+					var failCount = 0;
+					var successCount = 2;
+					debugger;
+					var fromIndex = 0;
+					var toIndex = 1;
+					var fromTower = towers[fromIndex];
+					var direction = 'right';
+					while(towers.get(towers.getLength() - 1).getLength() != numOfDiscs){
+						var toTower = towers[toIndex];
+						var moveSuccess = moveTo(currentTower, toTower);
+						if(!moveSuccess){
+							failCount++;
+							
+						}
+						else { // Yeah the disc moved
+							failCount = 0;
+							successCount++;
+						}
+						
+						// Time to switch towers
+						if(successCount - 1 == towers.length || failCount == towers.length){
+							if(direction == 'right'){
+								fromIndex++;
+							}
+						}
+						
+						toIndex++;
+					}
+				}
+				
+				function moveTo(towerFrom, towerTo){
+					var fromDisk = towerFrom.peek();
+					var toDisk = towerTo.peek();
+					var isSuccessful = false;
+					
+					// The disk can move only if the to tower is empty or its disk is bigger than the from disk 
+					if(fromDisk !== undefined && (towerTo.isEmpty() || fromDisk < toDisk)){
+						towerTo.push(fromDisk);
+						towerFrom.pop();
+						isSuccessful = true;
+					}
+					
+					return isSuccessful;
+				}
+				
+				function Stack(type){
+					var _arr = [];
+					var _top;
+					var _length = 0;
+					
+					var push;
+					var pop;
+					var peek;
+					
+					if(type == Stack.Array){
+						push = function (item){
+							_arr[_length] = item;
+							_length++;
+						};
+						
+						peek = function(){
+							var item;
+							
+							if(!isEmpty()){
+								item = _arr[_length - 1];
+							}
+							
+							return item;
+						}
+					
+						pop = function (){
+							var item;
+							if(!isEmpty()){
+								_length--;
+								item = _arr[_length];
+							}
+							
+							return item;
+						};
+					}
+					else {
+						push = function (item){
+							var node = {
+								item,
+								next: _top
+							};
+							_top = node;
+							_length++;
+						};
+						
+						peek = function(){
+							var item;
+							if(!isEmpty()){
+								item = _top.item;
+							}
+							return item;
+						};
+						
+						pop = function(){
+							var item;
+							if(!isEmpty()){
+								item = _top.item;
+								_top = _top.next;
+								_length--;
+							}
+							
+							return item;
+						};
+					}
+					
+					function isEmpty(){
+						return _length == 0;
+					}
+					
+					function getLength(){
+						return _length;
+					}
+					
+					return {
+						push,
+						pop,
+						isEmpty,
+						getLength,
+						peek
+					};
+				}
+				
+				Stack.Linked = 0;
+				Stack.Array = 1;
+				
+				function DirectionalArray(){
+					var _arr = [];
+					var _iterStep = 1; // Go to the right
+					var _curIndex = 0; // Start at the far left
+					
+					function toggleDirection(){
+						return _iterStep == 1 ? -1 : 1;
+					}
+					
+					function push(item){
+						_arr.push(item);
+					}
+					
+					function next(){
+						//_curIndex += _iterStep;
+						
+						var item;
+						var newIndex = _curIndex + _iterStep;
+						if(newIndex >= 0 && < _arr.length){
+							_curIndex = newIndex;
+							item = _arr[_curIndex];
+						}
+						
+						return item;
+						/*if(_curIndex == -1) _curIndex = _arr.length - 1;
+						else if(_curIndex == _arr.length) _curIndex = 0;
+						
+						return _arr[_curIndex];*/
+					}
+					
+					function get(index){
+						if(index === undefined) return _arr[_curIndex];
+						
+						return _arr[index];
+					}
+					
+					return {
+						toggleDirection,
+						push,
+						next,
+						get,
+						setIter: function(index){
+							_curIndex = index;
+						},
+						getIndex: function(){
+							return _curIndex;
+						},
+						getLength: function(){return _arr.length;}
+					};
+				}
+				
+				// move the discs
+				moveDiscsToTower(towers);
+				
+				// Print all the discs in the last tower to see if it has all the discs in the proper order
+				var lastTower = towers.get(numOfTowers - 1);
+				var discs = [];
+				while(!lastTower.isEmpty()){
+					discs.push(lastTower.pop());
+				}
+
+				htmlWriter.log(discs.join(', '));
+			})();
+        </script>
+    </head>
+
+    <body>
+        
+    </body>
+</html>

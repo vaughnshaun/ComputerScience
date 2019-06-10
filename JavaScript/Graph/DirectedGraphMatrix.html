@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Algorithm Page
+        </title>
+		<style>
+			
+        </style>
+
+		<script src="../utils.js">
+        </script>
+        <script>
+			(function(){
+				// The graph matrix that defines all vertices and their edge cost
+				var graphMatrix = [
+					// vertex 0
+					[0, 10, 15, /*20*/ undefined],
+					// vertex 1
+					[15,0,35,undefined],
+					// vertex 2
+					[undefined, undefined, 0, 30],
+					// vertex 3
+					[undefined,25,30,0],
+				];
+				
+				printDijkstra(graphMatrix);
+				
+				function shortestPathDijkstra(graph, start){
+					// Define the visited mask
+					// initial all vertices are not visited
+					//var visitedMask = 0;
+					var visitedMap = {};
+					var pathDistances = [];
+					
+					// Add the objects to the path distances
+					for(var i = 0; i < graph.length; i++){
+						pathDistances.push({
+						});
+					}
+					
+					var pq = PriorityQueue();
+					
+					pq.enqueue(start || 0);
+					while(!pq.isEmpty()){
+						var curStartIndex = pq.dequeue();
+						
+						// Process only if the current vertex has not been processed yet
+						//if(!isBitOn(curStartIndex)){
+						if(!visitedMap[curStartIndex]){
+							visitedMap[curStartIndex] = true;
+							//visitedMask = setBit(visitedMask, curStartIndex, true);
+							for(var i = 0; i < graph.length; i++){
+								// Only compare distances if i is not equal to the start and if there are edge connections
+								if(curStartIndex != i && hasPath(graph, curStartIndex, i)){
+									// Add the distance only if the new distance will be less than the current
+									// or if the current distance does not exist
+									var newDistance = (pathDistances[curStartIndex].distance || 0) + graph[curStartIndex][i];
+									if(pathDistances[i].distance === undefined || newDistance < pathDistances[i].distance){
+										pathDistances[i].distance = newDistance;
+										pathDistances[i].prev = curStartIndex;
+										pq.enqueue(i, pathDistances[i].distance);
+									}
+								}
+							}
+						}
+					}
+					
+					return pathDistances;
+				}
+				
+				function printDijkstra(graph, start){
+					shortestPathDijkstra(graph, start || 0).forEach(function(p, i){
+						htmlWriter.log('');
+						htmlWriter.log('Index: ' + i);
+						htmlWriter.log('Prev: ' + p.prev);
+						htmlWriter.log('Distance: ' + p.distance);
+						htmlWriter.log('');
+					});
+				}
+				
+				function hasPath(graph, start, end){
+					return graph[start][end] !== undefined;
+				}
+				
+				function PriorityQueue(){
+					var arr = [];
+					var minValue = undefined;
+					
+					function enqueue(item, key){
+						if(minValue === undefined){
+							minValue = key
+						}
+						else if(key < minValue){
+							minValue = key;
+						}
+						
+						arr.push({
+							item,
+							key
+						});
+					}
+					
+					function dequeue(){
+						var item;
+						var foundIndex;
+						for(var i = 0; i < arr.length && foundIndex === undefined; i++){
+							if(arr[i].key === undefined || arr[i].key == minValue){
+								foundIndex = i;
+							}
+						}
+						
+						if(foundIndex !== undefined){
+							item = arr[foundIndex].item;
+							arr.splice(foundIndex, 1);
+						}
+						
+						// Update the minValue
+						if(arr.length == 0){
+							minValue = undefined;
+						}
+						else {
+							minValue = arr[0].key;
+							
+							for(var i = 0; i < arr.length; i++){
+								if(minValue === undefined || (arr[i].key !== undefined && arr[i].key < minValue)){
+									minValue = arr[i].key;
+								}
+							}
+						}
+						
+						return item;
+					}
+					
+					function isEmpty(){
+						return arr.length == 0 ? true : false;
+					}
+					
+					return {
+						enqueue,
+						dequeue,
+						isEmpty
+					}
+				}
+				
+				/*function isBitOn(values, index){
+					return (values & (1 << index)) != 0;
+					//return values[index];
+				}
+				
+				function setBit(values, index, isOn){
+					// Make a mask that will only affect the desired index when applying changes
+					var mask = ~(1 << index);
+					
+					return values & (mask | (isOn ? (1 << index) : 0));
+					//values[index] = isOn;
+				}*/
+				
+			})();
+        </script>
+    </head>
+
+    <body>
+        
+    </body>
+</html>

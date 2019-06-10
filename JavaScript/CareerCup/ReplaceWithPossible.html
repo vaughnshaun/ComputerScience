@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Algorithm Page
+        </title>
+		<style>
+			
+        </style>
+
+		<script src="../utils.js">
+        </script>
+        <script>
+			(function(){
+				function replaceWithPossiblities(str){
+					var replaceMap = {}; // Tells if the index has a dollar sign
+					var result = []; // Store all results
+					var replacement = '$';
+					var replacementLength = 0;
+					var possibleValues = [];
+					
+					// Get all of the possibles and store the replacement character
+					for(var i = 0; i < str.length; i++){
+						if(str[i] == replacement){
+							replacementLength++;
+							replaceMap[i] = true;
+						}
+						else {
+							possibleValues.push(str[i]);
+						}
+					}
+					
+					// Call the main worker function
+					replaceHelper(possibleValues, str, '', 0, replaceMap, replacementLength, result);
+					
+					return result;
+				}
+				
+				function replaceHelper(possible, original, values, replaceIndex, replaceMap, replacementLength, result){
+					for(var i = 0; i < possible.length; i++){
+						// String speed vs array speed is about the same
+						//var newSet = [];
+						// Copy the previous vaules to the new set
+						// Use a string instead of an array
+						/*for(var j = 0; j < values.length; j++){
+							newSet.push(values[j]);
+						}*/
+						// The string is easier since it is a non reference
+						var newSet = values + possible[i];
+						
+						// Add the current possibility
+						//newSet.push(possible[i]);
+						
+						// Add the final result if at the last replacement symbol
+						if(replaceIndex == replacementLength - 1){
+							// Now copy the set to the result
+							var setIndex = 0;
+							var newResult = [];
+							for(var k = 0; k < original.length; k++){
+								if(replaceMap[k]){
+									newResult.push(newSet[setIndex]);
+									setIndex++;
+								}
+								else {
+									newResult.push(original[k]);
+								}
+							}
+							
+							// Add to the final result
+							result.push(newResult)
+;						}
+						else { // Otherwise keep looking for more replacement combinations
+							replaceHelper(possible, original, newSet, replaceIndex + 1, replaceMap, replacementLength, result);
+						}
+					}
+				}
+				
+				var str = '23$$';
+				//var str = '10$';
+				console.time()
+				//var str = '7$5$4$$3$$2$1';
+				var results = replaceWithPossiblities(str);
+				htmlWriter.log('length: ' + results.length);
+				results.forEach(set => {
+					htmlWriter.log(set.join(''));
+				});
+				console.timeEnd();
+			})();
+        </script>
+    </head>
+
+    <body>
+        
+    </body>
+</html>

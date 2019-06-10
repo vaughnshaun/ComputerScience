@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Algorithm Page
+        </title>
+
+        <style>
+        </style>
+        <script src="sorting.js">
+        </script>
+    </head>
+
+    <body>
+        <div>
+            <div>
+                <label>Sort Type: </label>
+                <select id="sort-type">
+                </select>
+            </div>
+            <div>
+                <label>List to Sort: </label>
+                <input id="input-list" type="text" />
+            </div>
+            <div>
+                <button id="sort">Sort</button>
+            </div>
+        </div>
+
+        <h3>Before Sort</h3>
+        <div id="before-sort">
+        </div>
+
+        <h3>After Sort</h3>
+        <div id="after-sort">
+        </div>
+
+        <div id="test-result">
+            <label>Verified: </label><span id="is-verified"></span>
+        </div>
+
+        <div id="stable-result">
+                <label>Stable: </label><span id="is-stable"></span>
+        </div>
+
+        <script>
+            (function(){
+                var selectSort = document.getElementById('sort-type');
+                var inputList = document.getElementById('input-list');
+                var beforeSort = document.getElementById('before-sort');
+                var afterSort = document.getElementById('after-sort');
+                var applySort = document.getElementById('sort');
+                var sort;
+
+                renderSortTypes();
+
+                applySort.addEventListener('click', function(){
+                    var inputValues = wrapValue(getInputValues());
+                    beforeSort.innerText = inputValues.map(i => getItemValue(i)).join(', ');
+                    sort(inputValues, getItemValue);
+                    afterSort.innerText = inputValues.map(i => getItemValue(i)).join(', ');
+
+                    // Do the verification (Check that the numbers are from greatest to least)
+                    var isVerified = true;
+                    for(var i = 0; i < inputValues.length -1 && isVerified; i++){
+                        isVerified = getItemValue(inputValues[i]) >= getItemValue(inputValues[i + 1]);
+                    }
+
+                    // Check for is stable
+                    var isStable = isListStable(inputValues);
+
+                    document.getElementById('is-verified').innerText = (isVerified ? 'Yes' : 'No');
+                    document.getElementById('is-stable').innerText = (isStable ? 'Yes' : 'No');
+                });
+
+                selectSort.addEventListener('change', setSort);
+
+                setSort();
+
+                function getItemValue(item){
+                    return item.value;
+                }
+
+                // List must be sorted
+                function isListStable(list){
+                    var isStable = true;
+                    for(var i = 0; i < list.length - 1 && isStable; i++){
+                        // Stable as long the indices are in the right order
+                        isStable = getItemValue(list[i]) != getItemValue(list[i + 1]) || list[i].index < list[i + 1].index;
+                    }
+
+                    return isStable;
+                }
+
+                function setSort(){
+                    sort = sorting[selectSort.value];
+                }
+
+                function renderSortTypes (){
+                    var options = [];
+                    for(var key in sorting){
+                        options.push('<option value="'+ key +'">'+ key +'</option>');
+                    }
+
+                    selectSort.innerHTML = options.join('');
+                    //selectSort.querySelector('option').attributes['selected'] = 'selected';
+                }
+
+                function getInputValues(){
+                    var defaultValues = [1,3,9,10,0,-1,-23,10,10,];
+                    var values = inputList.value;
+                    if(values){
+                        values = values.trim();
+                        values = values.split(',');
+                    }
+                    else {
+                        values = defaultValues;
+                    }
+
+                    return defaultValues;
+                }
+
+                // This will wrap a value in an object
+                // This is useful for checking whether a sort is stable
+                function wrapValue(list){
+                    return list.map((item, index) => ({
+                        value: item,
+                        index: index
+                    }));
+                }
+            })();
+        </script>
+    </body>
+</html>
