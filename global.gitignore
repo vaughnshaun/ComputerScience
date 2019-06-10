@@ -1,0 +1,8 @@
+.vs/
+**/bin/
+**/obj/
+packages/
+**/TestResults/
+**/allure-report/
+**/LogFiles
+**/.local-chromium
