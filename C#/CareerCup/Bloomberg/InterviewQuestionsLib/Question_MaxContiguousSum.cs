@@ -1,4 +1,5 @@
-﻿/// <summary>
+﻿using System;
+/// <summary>
 /// Max Contiguous Sum interview question
 /// </summary>
 namespace InterviewQuestionsLib
@@ -8,7 +9,7 @@ namespace InterviewQuestionsLib
     /// Write an eifficient program to find the sum of contiguous subarray
     /// within a one-dimensional array of numbers which has the largest sum.
     /// 
-    /// Solution:
+    /// Solution (Wrong):
     ///     Declare maxSum, maxStart, and maxEnd (maxStart and maxEnd should be passed in as out parameters)
     ///     Set maxStart and maxEnd to -1
     ///     If the array is null throw an exception
@@ -31,14 +32,44 @@ namespace InterviewQuestionsLib
     ///             maxEnd set to i
     ///         End If
     ///     End For
-    ///     
+    /// Solution (Correct - Constructing Kanade)
+    ///     Done by example
     /// </summary>
     public class Question_MaxContiguousSum
     {
-        public static int GetMaxContiguousSum(int[] array, out int maxStart, out int maxEnd)
+        public enum AlgoType
+        {
+            MinesCorrect,
+            MinesWrong,
+            Kadane
+        }
+
+        // Woun't work because Func can't work with out parameters.
+        // I need to use a custom delegate
+        //public Func<int[], int, int, int> GetMaxContiguousSum { get; private set; }
+        public delegate int SumDelegate(int[] input, out int maxStart, out int maxEnd);
+        public SumDelegate GetMaxContiguousSum { get; private set; }
+
+        public Question_MaxContiguousSum(AlgoType type)
+        {
+            switch (type)
+            {
+                case AlgoType.MinesCorrect:
+                    GetMaxContiguousSum = GetMaxContiguousSumMinesCorrect;
+                    break;
+                case AlgoType.MinesWrong:
+                    GetMaxContiguousSum = GetMaxContiguousSumMinesWrong;
+                    break;
+                case AlgoType.Kadane:
+                    GetMaxContiguousSum = GetMaxContiguousSumKadane;
+                    break;
+            }
+        }
+
+        private int GetMaxContiguousSumKadane(int[] array, out int maxStart, out int maxEnd)
         {
             int max_so_far = int.MinValue, max_ending_here = 0,
-       start = 0, end = 0, s = 0;
+            start = 0, end = 0, s = 0;
 
             for (int i = 0; i < array.Length; i++)
             {
@@ -55,16 +86,56 @@ namespace InterviewQuestionsLib
                 {
                     max_ending_here = 0;
                     s = i + 1;
-                }      
+                }
             }
             maxStart = start;
             maxEnd = end;
             return max_so_far;
-            /*maxStart = -1;
+        }
+
+        private int GetMaxContiguousSumMinesCorrect(int[] array, out int maxStart, out int maxEnd)
+        {
+            // Guard against invalid array
+            array = array ?? new int[] { };
+            maxStart = 0;
+            maxEnd = 0;
+            if (array.Length == 0)
+                return 0;
+
+            var sum = 0;
+            var maxSum = array[0];
+            var start = 0;
+
+            for (var i = 0; i < array.Length; i++)
+            {
+                sum += array[i];
+
+                if (sum > maxSum)
+                {
+                    maxSum = sum;
+                    maxEnd = i;
+                    maxStart = start;
+                }
+
+                if (sum < 0)
+                {
+                    sum = 0;
+                    start = i + 1;
+                }
+            }
+
+            return maxSum;
+        }
+
+        private int GetMaxContiguousSumMinesWrong(int[] array, out int maxStart, out int maxEnd)
+        {
+            maxStart = -1;
             maxEnd = -1;
 
-            if (array == null) throw new ArgumentNullException("An array is required to find the max contiguous sum.");
-            if (array.Length == 0) return -1;
+            array = array ?? throw new ArgumentNullException(nameof(array));
+
+            if (array.Length == 0)
+                return -1;
 
             int start = 0;
             int sum = 0;
@@ -85,7 +156,7 @@ namespace InterviewQuestionsLib
                 else
                 {
                     sum += array[i];
-                }
+                }*/
 
                 // I can just accumlate on the sum always because the following if statement will reset if there is a negative sum
                 sum += array[i];
@@ -104,7 +175,7 @@ namespace InterviewQuestionsLib
                 }
             }
 
-            return maxSum;*/
+            return maxSum;
         }
     }
 }

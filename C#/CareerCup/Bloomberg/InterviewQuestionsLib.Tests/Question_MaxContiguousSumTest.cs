@@ -52,9 +52,10 @@ namespace InterviewQuestionsLib.Tests
 
         private void TestSum(int[] array, int expectedStart, int expectedEnd, int expectedSum)
         {
+            var question = new Question_MaxContiguousSum(Question_MaxContiguousSum.AlgoType.MinesCorrect);
             int maxStart;
             int maxEnd;
-            int maxSum = Question_MaxContiguousSum.GetMaxContiguousSum(array, out maxStart, out maxEnd);
+            int maxSum = question.GetMaxContiguousSum(array, out maxStart, out maxEnd);
 
             int[] resultArray = new int[(maxEnd - maxStart) + 1];
             for (var i = maxStart; i <= maxEnd; i++)
