@@ -1,5 +1,6 @@
-﻿using System;
-
+﻿/// <summary>
+/// Max Contiguous Sum interview question
+/// </summary>
 namespace InterviewQuestionsLib
 {
     /// <summary>
@@ -54,9 +55,7 @@ namespace InterviewQuestionsLib
                 {
                     max_ending_here = 0;
                     s = i + 1;
-                }
-
-              
+                }      
             }
             maxStart = start;
             maxEnd = end;

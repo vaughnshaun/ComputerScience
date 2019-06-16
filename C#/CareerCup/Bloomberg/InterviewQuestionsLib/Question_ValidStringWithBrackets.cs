@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace InterviewQuestionsLib
 {
     /// <summary>
+    /// CORRECTIONS HERE: https://codereview.stackexchange.com/questions/222378/careercup-bloomberg-check-if-string-is-valid-based-on-brackets
     /// 1. Check if string s is valid based on brackets
     ///     (({{}})) is a valid s 
     ///     {[]} is a valid s
@@ -40,17 +40,25 @@ namespace InterviewQuestionsLib
     /// </summary>
     public class Question_ValidStringWithBrackets
     {
-        public bool IsValidBracketString(String s, BracketValidator validator = null)
+        public bool IsValidBracketString(String input, BracketValidator validator = null)
         {
-            if (s == null)
-                throw new ArgumentNullException("A string is required");
+            // Message not needed since error is for the developer and not the end user
+            /*if (s == null)
+                throw new ArgumentNullException("A string is required");*/
+            /*if (input == null)
+                throw new ArgumentNullException(nameof(input));*/
+            // Use the tenary operator for readability
+            input = input ?? throw new ArgumentNullException(nameof(input));
 
-            if (validator == null)
-                validator = BracketValidator.CreateDefaultValidator();
+            /*if (validator == null)
+                validator = BracketValidator.CreateDefaultValidator();*/
+            validator = validator ?? BracketValidator.CreateDefaultValidator();
 
-            Stack<char> openStack = new Stack<char>();
+            // Prevent redunant type declarations
+            //Stack<char> openStack = new Stack<char>();
+            var openStack = new Stack<char>();
 
-            foreach (var curBracket in s)
+            foreach (var curBracket in input)
             {
                 if (validator.IsOpen(curBracket))
                 {
@@ -71,14 +79,20 @@ namespace InterviewQuestionsLib
 
             public void AddPair(char open, char close)
             {
-                if (char.IsWhiteSpace(open) || char.IsWhiteSpace(close))
-                    throw new ArgumentException("A bracket must be specified. An empty character is not allowed.");
+                // Guarding whitespace is not in the spec
+                /*if (char.IsWhiteSpace(open) || char.IsWhiteSpace(close))
+                    throw new ArgumentException("A bracket must be specified. An empty character is not allowed.");*/
 
+                // Could ignore instead of throwing an error
                 if (openBrackets.Contains(open) || openBrackets.Contains(close))
                     throw new ArgumentException("Brackets exist already.");
 
                 if (closedOpenedPair.ContainsKey(open) || closedOpenedPair.ContainsKey(close))
                     throw new ArgumentException("Brackets exist already.");
+
+                // Forget to guard against open and closed being the same
+                if (open == close)
+                    throw new ArgumentException("Open and close cannot be the same.");
 
                 openBrackets.Add(open);
                 closedOpenedPair.Add(close, open);

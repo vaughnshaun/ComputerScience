@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
+/// <summary>
+/// Modified bubble sort
+/// </summary>
 namespace InterviewQuestionsLib
 {
     /// <summary>
@@ -33,7 +34,7 @@ namespace InterviewQuestionsLib
     public class Question_ModifiedBubbleSort
     {
         public int LastSwapCount { get; private set; }
-        public const int MAX_SWAP_COUNT = 1;
+        public const int MaxSwapCount = 1;
 
         public void BubbleSort<T>(T[] array, bool isDesc = false) where T : IComparable
         {
@@ -61,7 +62,7 @@ namespace InterviewQuestionsLib
                     }
                 }
 
-                if (LastSwapCount <= MAX_SWAP_COUNT)
+                if (LastSwapCount <= MaxSwapCount)
                     break;
             }
         }
